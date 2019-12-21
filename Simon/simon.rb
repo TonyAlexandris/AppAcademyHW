@@ -4,7 +4,7 @@ class Simon
   attr_accessor :sequence_length, :game_over, :seq
 
   def initialize
-    @sequence_length = 1
+    @sequence_length = 0
     @game_over = false
     @seq = []
   end
@@ -37,7 +37,7 @@ class Simon
 
   def require_sequence
     count = 0
-    while count < seq.length
+    while count < sequence_length
       color = gets.chomp
       if color != seq[count]
         @game_over = true
@@ -49,6 +49,7 @@ class Simon
 
   def add_random_color
     seq << COLORS.sample
+    self.sequence_length += 1
   end
 
   def round_success_message
@@ -60,9 +61,9 @@ class Simon
   end
 
   def reset_game
-    @sequence_length = 1
-    @game_over = false
-    @seq = []
+    self.sequence_length = 0
+    self.game_over = false
+    self.seq = []
   end
 end
 
