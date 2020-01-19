@@ -20,18 +20,30 @@ class Play
   end
 
   def self.find_by_title(title)
-    data = PlayDBConnection.instance.execute("SELECT * FROM plays WHERE title = #{title}")
+    data = PlayDBConnection.instance.execute(<<-SQL, title)
+      SELECT 
+        * 
+      FROM 
+        plays 
+      WHERE 
+        title = ?
+    SQL
     data.map { |datum| Play.new(datum) }
   end
 
   def self.find_by_playwright(name)
-    data = PlayDBConnection.instance.execute(<<-SQL
-      SELECT * 
-      FROM plays 
-      JOIN playwrights ON playwright_id = playwrights.id
-      WHERE name = #{name}
+    data = PlayDBConnection.instance.execute(<<-SQL, name)
+      SELECT 
+        * 
+      FROM 
+        plays 
+      JOIN 
+        playwrights 
+      ON 
+        playwright_id = playwrights.id
+      WHERE 
+        name = ?
     SQL
-    )
     data.map { |datum| Play.new(datum) }
   end
 
@@ -74,8 +86,15 @@ class Playwright
   end
 
   def self.find_by_name(name)
-    data = PlayDBConnection.instance.execute("SELECT * FROM playwrights WHERE name = #{name}")
-    data.map { |datum| Play.new(datum) }
+    data = PlayDBConnection.instance.execute(<<-SQL, name)
+      SELECT
+        *
+      FROM
+        playwrights
+      WHERE
+        name = ?
+    SQL
+    data.map { |datum| Playwright.new(datum) }
   end
 
   def initialize(options)
@@ -109,15 +128,18 @@ class Playwright
 
   def get_plays
     raise "#{self} not in database" unless self.id
-    data = PlayDBConnection.instance.execute(<<-SQL
-      SELECT title
-      FROM playwrights 
-      JOIN plays ON playwrights.id = plays.playwright_id
-      WHERE plays.playwright_id = #{self.id}
+    data = PlayDBConnection.instance.execute(<<-SQL, self.id)
+      SELECT
+        *
+      FROM
+        playwrights 
+      JOIN
+        plays
+      ON
+        playwrights.id = plays.playwright_id
+      WHERE
+        plays.playwright_id = ?
     SQL
-    )
     data.map { |datum| Play.new(datum) }
   end
 end
-
-print Play.find_by_playwright("Arthur Miller")
